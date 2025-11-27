@@ -38,6 +38,7 @@ from transformers.trainer_utils import get_last_checkpoint
 from transformers.utils import is_accelerate_available
 from trl import SFTConfig, SFTTrainer
 import transformers
+from accelerate.utils import AORecipeKwargs
 
 # Local
 from tuning.config import configs, peft_config
@@ -489,6 +490,25 @@ def train(
         TrainerClass = SumLossSFTTrainer
     else:
         TrainerClass = SFTTrainer
+
+    # from accelerate import Accelerator
+
+    # acc = Accelerator()
+    # if acc.is_main_process:
+    #     import pdb
+    #     pdb.set_trace()
+
+    #     accelerator = Accelerator(mixed_precision="fp8", kwargs_handlers=[AORecipeKwargs()])
+
+    # if training_args.mixed_precision == "fp8":
+
+    #     from tuners.utils.fp8_utils import get_fp8_filter_func
+
+    #     acc_cfg = training_args.accelerator_config or {}
+    #     handlers = list(acc_cfg.get("kwargs_handlers") or [])
+    #     handlers.append(AORecipeKwargs(module_filter_func=get_fp8_filter_func))
+    #     acc_cfg["kwargs_handlers"] = handlers
+    #     training_args.accelerator_config = acc_cfg
 
     trainer = TrainerClass(
         model=model,

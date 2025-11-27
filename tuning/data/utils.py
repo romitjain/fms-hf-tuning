@@ -18,6 +18,7 @@ import io
 import json
 import logging
 import os
+import regex as re
 
 # Third Party
 from datasets import (
@@ -49,7 +50,11 @@ def get_loader_for_filepath(file_path: str) -> str:
         return "arrow"
     if ext in (".parquet",):
         return "parquet"
-    return ext
+
+    if re.fullmatch(r"\.[A-Za-z0-9]+", ext):
+        return ext
+    else:
+        return None
 
 
 def load_yaml_or_json(file_path: str) -> dict:

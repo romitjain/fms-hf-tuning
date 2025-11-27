@@ -386,6 +386,10 @@ class DataPreProcessor:
         train_split = "train"
         eval_split = "test"
 
+        dataset = DatasetDict({
+            "train": dataset["train_sft"]
+        })
+
         seed = self.processor_config.seed
 
         # TODO: This is a problem.
