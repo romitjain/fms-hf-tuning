@@ -60,6 +60,7 @@ fms-accel-all = [
     "fms-acceleration-moe",
     "fms-acceleration-odm"
 ]
+fp8 = ["torchao==0.13.0"]
 
 [tool.setuptools.packages.find]
 exclude = ["tests", "tests.*"]
