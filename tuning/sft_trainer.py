@@ -568,7 +568,7 @@ def train(
         tc_callback.on_init_end(trainer.args, trainer.state, trainer.control)
         trainer.add_callback(tc_callback)
 
-    trainer.add_callback(PerfCallback(accelerator=trainer.accelerator, log_every_steps=1))
+    # trainer.add_callback(PerfCallback(accelerator=trainer.accelerator, log_every_steps=1))
     trainer.train(resume_from_checkpoint)
     additional_metadata = {}
     additional_metadata["added_tokens_info"] = added_tokens_dict
