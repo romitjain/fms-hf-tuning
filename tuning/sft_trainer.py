@@ -38,7 +38,7 @@ from transformers.trainer_utils import get_last_checkpoint
 from transformers.utils import is_accelerate_available
 from trl import SFTConfig, SFTTrainer
 import transformers
-from accelerate.utils import AORecipeKwargs
+from accelerate.utils import AORecipeKwargs, set_seed
 from torchao.float8 import Float8LinearConfig
 
 # Local
@@ -69,7 +69,7 @@ from tuning.utils.error_logging import (
     write_termination_log,
 )
 from tuning.utils.logging import pretty_print_args, set_log_level
-
+from tuning.callbacks.perf import PerfCallback
 
 def train(
     model_args: configs.ModelArguments,
@@ -225,7 +225,7 @@ def train(
 
     # Initialize Trackers And Callbacks
     trackers = []
-    trainer_callbacks = []
+    trainer_callbacks = [PerfCallback]
     tc_callback = None
 
     if exp_metadata and (not isinstance(exp_metadata, dict)):
@@ -504,22 +504,24 @@ def train(
         peft_config=peft_config,
     )
 
-    from tuning.utils.fp8_utils import get_fp8_filter_func
-    config = Float8LinearConfig.from_recipe_name("tensorwise")
-    ao_recipe = AORecipeKwargs(config=config, module_filter_func=get_fp8_filter_func(model))
-    trainer.accelerator.ao_recipe_handler = ao_recipe
+    set_seed(42, device_specific=True)
 
-    if trainer.accelerator.is_main_process:
-        def debug_tokens(batch):
-            ids = batch["input_ids"]
-            bsz, seqlen = ids.shape
-            print("bsz, seqlen, tokens:", bsz, seqlen, bsz * seqlen, "mod16:", (bsz * seqlen) % 16)
+    # from tuning.utils.fp8_utils import get_fp8_filter_func
+    # config = Float8LinearConfig.from_recipe_name("tensorwise")
+    # ao_recipe = AORecipeKwargs(config=config, module_filter_func=get_fp8_filter_func(model))
+    # trainer.accelerator.ao_recipe_handler = ao_recipe
 
-        dl = trainer.get_train_dataloader()
-        for elem in dl:
-            break
+    # if trainer.accelerator.is_main_process:
+    #     def debug_tokens(batch):
+    #         ids = batch["input_ids"]
+    #         bsz, seqlen = ids.shape
+    #         print("bsz, seqlen, tokens:", bsz, seqlen, bsz * seqlen, "mod16:", (bsz * seqlen) % 16)
 
-        debug_tokens(elem)
+    #     dl = trainer.get_train_dataloader()
+    #     for elem in dl:
+    #         break
+
+    #     debug_tokens(elem)
 
     # We track additional metrics and experiment metadata after trainer object creation
     # this ensure that the process is not repeated multiple times for FSDP runs.
