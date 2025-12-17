@@ -4,16 +4,17 @@
   "eval_steps": 1000,
   "gradient_accumulation_steps": 1,
   "include_tokens_per_second": true,
+  "include_num_input_tokens_seen": "non_padding",
   "learning_rate": 1e-5,
   "logging_steps": 1,
   "logging_strategy": "steps",
   "lr_scheduler_type": "linear",
   "max_seq_length": 8192,
   "model_name_or_path": "ibm-granite/granite-4.0-1b",
-  "num_train_epochs": 2,
+  "num_train_epochs": 1,
   "optim": "adamw_torch",
-  "per_device_eval_batch_size": 4,
-  "per_device_train_batch_size": 2,
+  "per_device_eval_batch_size": 8,
+  "per_device_train_batch_size": 4,
   "resume_from_checkpoint": "false",
   "save_strategy": "epoch",
   "trackers": [
@@ -21,7 +22,8 @@
   ],
   "use_flash_attn": true,
   "weight_decay": 0.1,
-  "output_dir": "./fp8/fp8",
-  "save_model_dir": "./fp8/fp8",
-  "data_config_path": "./config/data_config.yaml"
+  "output_dir": "./tmp/fp8",
+  "save_model_dir": "./tmp/fp8/final",
+  "data_config_path": "./config/data_config.yaml",
+  "max_grad_norm": 10.0
 }
