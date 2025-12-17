@@ -19,8 +19,8 @@
   "save_strategy": "epoch",
   "use_flash_attn": true,
   "weight_decay": 0.1,
-  "output_dir": "./out/bf16/final",
-  "save_model_dir": "./out/bf16/",
+  "output_dir": "./tmp/bf16/",
+  "save_model_dir": "./tmp/bf16/final/",
   "data_config_path": "./config/data_config.yaml",
   "max_grad_norm": 10.0
 }

@@ -62,6 +62,7 @@ class FileLoggingCallback(TrainerCallback):
                     "timestamp": datetime.isoformat(datetime.now()),
                 },
             }
+            log_obj.update(**logs)
         except KeyError:
             return
 
