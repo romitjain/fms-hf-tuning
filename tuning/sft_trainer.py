@@ -69,7 +69,6 @@ from tuning.utils.error_logging import (
     write_termination_log,
 )
 from tuning.utils.logging import pretty_print_args, set_log_level
-from tuning.callbacks.perf import PerfCallback
 
 def train(
     model_args: configs.ModelArguments,
@@ -506,22 +505,32 @@ def train(
 
     set_seed(42, device_specific=True)
 
-    # from tuning.utils.fp8_utils import get_fp8_filter_func
-    # config = Float8LinearConfig.from_recipe_name("tensorwise")
-    # ao_recipe = AORecipeKwargs(config=config, module_filter_func=get_fp8_filter_func(model))
-    # trainer.accelerator.ao_recipe_handler = ao_recipe
+    from tuning.utils.fp8_utils import get_fp8_filter_func
+    config = Float8LinearConfig.from_recipe_name("tensorwise")
+    ao_recipe = AORecipeKwargs(config=config, module_filter_func=get_fp8_filter_func(model))
+    trainer.accelerator.ao_recipe_handler = ao_recipe
 
-    # if trainer.accelerator.is_main_process:
-    #     def debug_tokens(batch):
-    #         ids = batch["input_ids"]
-    #         bsz, seqlen = ids.shape
-    #         print("bsz, seqlen, tokens:", bsz, seqlen, bsz * seqlen, "mod16:", (bsz * seqlen) % 16)
+    if trainer.accelerator.is_main_process:
+        def debug_tokens(batch):
+            ids = batch["input_ids"]
+            bsz, seqlen = ids.shape
+            print("bsz, seqlen, tokens:", bsz, seqlen, bsz * seqlen, "mod16:", (bsz * seqlen) % 16)
 
-    #     dl = trainer.get_train_dataloader()
-    #     for elem in dl:
-    #         break
+        dl = trainer.get_train_dataloader()
+        for elem in dl:
+            break
 
-    #     debug_tokens(elem)
+        debug_tokens(elem)
+
+        fp8_filter = get_fp8_filter_func(model)
+        results = []
+        for fqn, module in model.named_modules():
+            allowed = fp8_filter(module=module, fqn=fqn)
+            results.append((fqn, allowed))
+
+        results = [r[0] for r in results if r[1]]
+
+        print(f"Layers getting adapted for FP8 training: {[r for r in results if "layers.0" in r]}")
 
     # We track additional metrics and experiment metadata after trainer object creation
     # this ensure that the process is not repeated multiple times for FSDP runs.
@@ -568,7 +577,6 @@ def train(
         tc_callback.on_init_end(trainer.args, trainer.state, trainer.control)
         trainer.add_callback(tc_callback)
 
-    # trainer.add_callback(PerfCallback(accelerator=trainer.accelerator, log_every_steps=1))
     trainer.train(resume_from_checkpoint)
     additional_metadata = {}
     additional_metadata["added_tokens_info"] = added_tokens_dict
