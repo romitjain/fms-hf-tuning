@@ -502,6 +502,10 @@ def train(
         peft_config=peft_config,
     )
 
+    import types
+    from tuning.utils.data_utils import _get_train_sampler
+    trainer._get_train_sampler = types.MethodType(_get_train_sampler, trainer)
+
     # Set seed for accelerate processes
     set_seed(training_args.seed, device_specific=True)
 
