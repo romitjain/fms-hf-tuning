@@ -451,6 +451,14 @@ class DataPreProcessor:
                 dataset_config.name, str(split_datasets)
             )
         )
+
+        order_col = [f for f in dataset.column_names["train"] if "order" in f]
+        if not order_col:
+            raise RuntimeError("Order column not found in the dataset")
+
+        logger.info(f"Ordering the train split of {dataset_config.name} by {order_col[0]} column")
+        split_datasets["train"] = split_datasets["train"].sort(order_col[0])
+
         return split_datasets
 
     def _prepare_processed_datasets(
