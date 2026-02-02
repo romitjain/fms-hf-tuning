@@ -15,6 +15,7 @@
 # Definition of some predefined data preprocessing functions that we need.
 
 # Standard
+import json
 from enum import Enum
 from typing import Any, Dict, List, Union
 
@@ -519,6 +520,9 @@ def tokenize_and_apply_chat_template_with_masking(
 
     tools = element["tools"] if "tools" in element else None
     documents = element["documents"] if "documents" in element else None
+
+    if tools and isinstance(tools, str):
+        tools = json.loads(tools)
 
     # Tokenize the whole sample
     input_ids = __wrap_jinja_rendering_with_exception_handling(
