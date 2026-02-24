@@ -84,7 +84,7 @@ def convert_safetensors_file(inp: Path, out: Path) -> None:
                 t = t.to(torch.bfloat16)
             tensors[key] = t
     out.parent.mkdir(parents=True, exist_ok=True)
-    save_file(tensors, str(out), metadata={"converted_to": "bfloat16"})
+    save_file(tensors, str(out), metadata={"format": "pt"})
     print(f"[safetensors] wrote: {out}")
 
 

@@ -1,0 +1,17 @@
+dataprocessor:
+    type: default
+datasets:
+  - name: dataset_1
+    split:
+      train: 0.8
+      validation: 0.2
+    data_paths:
+      - HuggingFaceTB/OpenHermes-2.5-H4
+    data_handlers:
+      - name: tokenize_and_apply_chat_template_with_masking
+        arguments:
+          remove_columns: all
+          fn_kwargs:
+            max_length: 
+            formatted_text_column_name: "formatted_chat_data"
+            conversation_column: "messages"

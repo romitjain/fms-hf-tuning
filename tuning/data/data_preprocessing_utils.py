@@ -93,7 +93,7 @@ def get_data_collator(
 
     if is_traindata_tokenized:
         return DataCollatorForSeq2Seq(
-            tokenizer=tokenizer, padding=True, max_length=max_seq_length
+            tokenizer=tokenizer, padding=True, max_length=max_seq_length, pad_to_multiple_of=16
         )
 
     # TODO: near term - how response template ids are parsed out needs to be cleaned.

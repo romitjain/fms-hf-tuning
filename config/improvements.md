@@ -1,0 +1,4 @@
+- set tf32
+- set single rank logging
+- set torch compile
+- set embedding resize to be multiple of 8
